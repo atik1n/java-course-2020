@@ -22,7 +22,6 @@ public class User implements UserDetails {
   @Size(min = 5)
   @NotNull
   private String password;
-  @Column(columnDefinition = "boolean default 1")
   private boolean active;
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -39,6 +38,11 @@ public class User implements UserDetails {
   public User(String username, String password) {
     this.username = username;
     this.password = password;
+  }
+
+  @PrePersist
+  private void PrePersist() {
+    this.active = true;
   }
 
   @Override
@@ -70,22 +74,22 @@ public class User implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return true;
+    return active;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return !active;
+    return active;
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return true;
+    return active;
   }
 
   @Override
   public boolean isEnabled() {
-    return !active;
+    return active;
   }
 
   @Override
