@@ -5,12 +5,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "table_users")
+@Table(name = "users")
 public class User implements UserDetails {
   @Id
   @NotNull
@@ -25,7 +26,7 @@ public class User implements UserDetails {
   private boolean active;
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
-          name = "table_user_authority",
+          name = "user_authority",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "authority_id")
   )
@@ -46,7 +47,7 @@ public class User implements UserDetails {
   }
 
   @Override
-  public Set<Authority> getAuthorities() {
+  public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
   }
 

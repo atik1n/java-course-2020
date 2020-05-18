@@ -1,5 +1,6 @@
 package me.salieri.Java_Course.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
-@Table(name = "table_authorities")
+@Table(name = "authorities")
 public class Authority implements GrantedAuthority {
   @Id
   @NotNull
@@ -17,7 +18,8 @@ public class Authority implements GrantedAuthority {
   @Size(min = 5)
   @NotNull
   private String authority;
-  @Transient
+
+  @JsonIgnore
   @ManyToMany(mappedBy = "authorities")
   private Set<User> users;
 

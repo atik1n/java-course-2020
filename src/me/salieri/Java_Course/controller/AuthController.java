@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +27,7 @@ public class AuthController {
   private UserService userService;
 
   @GetMapping("/auth")
+  @Transactional
   public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest request) throws Exception {
     authenticate(request.getUsername(), request.getPassword());
     final User userDetails = userService.loadUserByUsername(request.getUsername());
@@ -33,7 +35,8 @@ public class AuthController {
     return ResponseEntity.ok(new JwtResponse(token));
   }
 
-  private void authenticate(String username, String password) throws Exception {
+  @Transactional
+  public void authenticate(String username, String password) throws Exception {
     try {
       authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     } catch (DisabledException e) {

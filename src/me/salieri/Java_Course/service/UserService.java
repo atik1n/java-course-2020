@@ -15,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -29,18 +30,19 @@ public class UserService implements UserDetailsService {
 
   @Override
   public User loadUserByUsername(String s) throws UsernameNotFoundException {
-    User user = userRepository.findByUsername(s);
+    Optional<User> user = userRepository.findByUsername(s);
 
-    if (user == null) {
+    if (user.isEmpty()) {
       throw new UsernameNotFoundException("User not found");
     }
 
-    return user;
+    return user.get();
   }
 
   public boolean saveUser(User user) {
-    User loaded = userRepository.findByUsername(user.getUsername());
-    if (loaded != null) {
+    Optional<User> loaded = userRepository.findByUsername(user.getUsername());
+
+    if (loaded.isPresent()) {
       return false;
     }
 
