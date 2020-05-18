@@ -6,23 +6,39 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "users_table")
+@Table(name = "table_users")
 public class User implements UserDetails {
   @Id
+  @NotNull
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Size(min = 5)
+  @NotNull
   private String username;
   @Size(min = 5)
+  @NotNull
   private String password;
+  @Column(columnDefinition = "boolean default 1")
+  private boolean active;
   @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+          name = "table_user_authority",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "authority_id")
+  )
   private Set<Authority> authorities;
 
   public User() {
 
+  }
+
+  public User(String username, String password) {
+    this.username = username;
+    this.password = password;
   }
 
   @Override
@@ -33,7 +49,7 @@ public class User implements UserDetails {
   public void setAuthorities(Set<Authority> authorities) {
     this.authorities = authorities;
   }
-
+  
   @Override
   public String getPassword() {
     return password;
@@ -59,7 +75,7 @@ public class User implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return true;
+    return !active;
   }
 
   @Override
@@ -69,6 +85,11 @@ public class User implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return !active;
+  }
+
+  @Override
+  public String toString() {
+    return this.username + " " + this.authorities.toString();
   }
 }

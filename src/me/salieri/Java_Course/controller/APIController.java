@@ -10,18 +10,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
 @Controller
 public class APIController {
   @Autowired
-  private UserRepository userRepository;
+  private UserService userService;
 
   @GetMapping(path = "/")
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public String sayHello() {
-    return "{ \"shit\": \"fucked\", \"test\": \"" + (userRepository == null) + "\" }";
+    List<User> users = userService.allUsers();
+    return "{ \"code\": " + HttpServletResponse.SC_OK + ", \"test\": \"" + users.toString() + "\" }";
   }
 }
