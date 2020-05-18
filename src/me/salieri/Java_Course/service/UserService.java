@@ -5,7 +5,6 @@ import me.salieri.Java_Course.entity.User;
 import me.salieri.Java_Course.repository.AuthorityRepository;
 import me.salieri.Java_Course.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +23,7 @@ public class UserService implements UserDetailsService {
   @Autowired
   UserRepository userRepository;
   @Autowired
-  AuthorityRepository roleRepository;
+  AuthorityRepository authorityRepository;
   @Autowired
   PasswordEncoder passwordEncoder;
 
@@ -46,7 +45,8 @@ public class UserService implements UserDetailsService {
       return false;
     }
 
-    user.setAuthorities(Collections.singleton(new Authority(1L, "USER")));
+    Authority role = authorityRepository.findByAuthority("USER").orElse(new Authority(1337L, "USER"));
+    user.setAuthorities(Collections.singleton(role));
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     userRepository.save(user);
     return true;
