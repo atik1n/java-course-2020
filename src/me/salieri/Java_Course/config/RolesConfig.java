@@ -12,8 +12,8 @@ public class RolesConfig {
       put(adminID, "ADMIN");
       put(3L, "USER");
       put(4L, "PERSON");
-      put(10L, "TEACHER");
-      put(11L, "STUDENT");
+      put(5L, "TEACHER");
+      put(6L, "STUDENT");
     }
   };
 

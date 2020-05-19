@@ -40,10 +40,10 @@ public class BasicSetup implements ApplicationListener<ContextRefreshedEvent> {
 
     // Создадим роли
     for (Map.Entry<Long, String> pair : RolesConfig.roles.entrySet()) {
-      authorityRepository.findById(pair.getKey()).orElseGet(() -> createAuthority(pair.getKey(), pair.getValue()));
+      authorityRepository.findById(pair.getKey()).orElseGet(() -> createAuthority(pair.getValue()));
     }
     Authority owner = authorityRepository.findById(RolesConfig.ownerID).orElseGet(
-        () -> createAuthority(RolesConfig.ownerID, "OWNER")
+        () -> createAuthority("OWNER")
     );
 
     // Добавим нашего администратора
@@ -57,8 +57,8 @@ public class BasicSetup implements ApplicationListener<ContextRefreshedEvent> {
   }
 
   @Transactional
-  public Authority createAuthority(final Long id, final String name) {
-    Authority authority = new Authority(id, name);
+  public Authority createAuthority(final String name) {
+    Authority authority = new Authority(name);
     authorityRepository.save(authority);
     return authority;
   }

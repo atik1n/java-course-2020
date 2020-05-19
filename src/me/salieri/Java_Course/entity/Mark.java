@@ -12,13 +12,13 @@ public class Mark {
   private long id;
   @ManyToOne
   @JoinColumn(referencedColumnName="id")
-  private People student;
+  private Person student;
   @ManyToOne
   @JoinColumn(referencedColumnName="id")
   private Subject subject;
   @ManyToOne
   @JoinColumn(referencedColumnName="id")
-  private People teacher;
+  private Person teacher;
   @NotNull
   private int value;
 
@@ -30,11 +30,11 @@ public class Mark {
     this.id = id;
   }
 
-  public People getStudent() {
+  public Person getStudent() {
     return student;
   }
 
-  public void setStudent(People student) {
+  public void setStudent(Person student) {
     this.student = student;
   }
 
@@ -46,11 +46,11 @@ public class Mark {
     this.subject = subject;
   }
 
-  public People getTeacher() {
+  public Person getTeacher() {
     return teacher;
   }
 
-  public void setTeacher(People teacher) {
+  public void setTeacher(Person teacher) {
     this.teacher = teacher;
   }
 

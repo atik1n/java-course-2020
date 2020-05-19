@@ -27,13 +27,13 @@ public class Authority implements GrantedAuthority {
 
   }
 
-  public Authority(Long id) {
-    this.id = id;
+  public Authority(String authority) {
+    this.authority = authority;
   }
 
-  public Authority(Long id, String name) {
+  public Authority(String authority, Long id) {
     this.id = id;
-    this.authority = name;
+    this.authority = authority;
   }
 
   @Override

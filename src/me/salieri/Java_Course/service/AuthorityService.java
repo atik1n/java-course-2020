@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -18,22 +19,18 @@ public class AuthorityService {
   AuthorityRepository authorityRepository;
 
   public Authority loadAuthorityByName(String name) throws NotFoundException {
-    Optional<Authority> authority = authorityRepository.findByAuthority(name);
-
+    Optional<Authority> authority = authorityRepository.findByAuthority(Objects.requireNonNull(name));
     if (authority.isEmpty()) {
       throw new NotFoundException("Authority not found");
     }
-
     return authority.get();
   }
 
   public Authority loadAuthorityById(Long id) throws NotFoundException {
-    Optional<Authority> authority = authorityRepository.findById(id);
-
+    Optional<Authority> authority = authorityRepository.findById(Objects.requireNonNull(id));
     if (authority.isEmpty()) {
       throw new NotFoundException("Authority not found");
     }
-
     return authority.get();
   }
 

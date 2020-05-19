@@ -1,6 +1,5 @@
 package me.salieri.Java_Course.service;
 
-import me.salieri.Java_Course.config.RolesConfig;
 import me.salieri.Java_Course.entity.Authority;
 import me.salieri.Java_Course.entity.SecuredUser;
 import me.salieri.Java_Course.entity.User;
@@ -13,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,82 +27,80 @@ public class UserService implements UserDetailsService {
 
   @Override
   public User loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> user = userRepository.findByUsername(username);
-
+    Optional<User> user = userRepository.findByUsername(Objects.requireNonNull(username));
     if (user.isEmpty()) {
       throw new UsernameNotFoundException("User not found");
     }
-
     return user.get();
   }
 
   public SecuredUser loadSecuredUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> user = userRepository.findByUsername(username);
-
+    Optional<User> user = userRepository.findByUsername(Objects.requireNonNull(username));
     if (user.isEmpty()) {
       throw new UsernameNotFoundException("User not found");
     }
-
     SecuredUser secUser = new SecuredUser();
     BeanUtils.copyProperties(user.get(), secUser);
     return secUser;
   }
 
   public User loadUserById(Long id) throws UsernameNotFoundException {
-    Optional<User> user = userRepository.findById(id);
-
+    Optional<User> user = userRepository.findById(Objects.requireNonNull(id));
     if (user.isEmpty()) {
       throw new UsernameNotFoundException("User not found");
     }
-
     return user.get();
   }
 
   public SecuredUser loadSecuredUserById(Long id) throws UsernameNotFoundException {
-    Optional<User> user = userRepository.findById(id);
-
+    Optional<User> user = userRepository.findById(Objects.requireNonNull(id));
     if (user.isEmpty()) {
       throw new UsernameNotFoundException("User not found");
     }
-
     SecuredUser secUser = new SecuredUser();
     BeanUtils.copyProperties(user.get(), secUser);
     return secUser;
   }
 
   public User loadUserByPrincipal(Object user) throws UsernameNotFoundException {
-    return loadUserByUsername(((User)user).getUsername());
+    return loadUserByUsername(((User)Objects.requireNonNull(user)).getUsername());
   }
 
   public SecuredUser loadSecuredUserByPrincipal(Object user) throws UsernameNotFoundException {
-    return loadSecuredUserByUsername(((User)user).getUsername());
+    return loadSecuredUserByUsername(((User)Objects.requireNonNull(user)).getUsername());
   }
 
-  public boolean saveUser(User user, Set<Authority> authorities) {
+  public User saveUser(User user) {
     Optional<User> loaded = userRepository.findByUsername(user.getUsername());
-
     if (loaded.isPresent()) {
-      return false;
+      return null;
     }
 
-    user.setAuthorities(authorities);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
-    userRepository.save(user);
-    return true;
+    return userRepository.save(user);
   }
 
   public boolean deleteUserByUsername(String username) {
     Optional<User> loaded = userRepository.findByUsername(username);
-
     if (loaded.isEmpty()) {
       return false;
     }
-
     if (authorityService.hasAuthority(loaded.get(), "OWNER")) {
       return false;
     }
-
     userRepository.deleteByUsername(username);
+    return true;
+  }
+
+  public boolean deleteUserById(Long id) {
+    Optional<User> loaded = userRepository.findById(id);
+    if (loaded.isEmpty()) {
+      return false;
+    }
+    if (authorityService.hasAuthority(loaded.get(), "OWNER")) {
+      return false;
+    }
+    userRepository.deleteById(id);
     return true;
   }
 

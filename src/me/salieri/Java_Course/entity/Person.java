@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "people")
-public class People {
+public class Person {
+  public static char STUDENT = 'S';
+  public static char TEACHER = 'T';
+
   @Id
   @NotNull
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +39,20 @@ public class People {
   @JsonIgnore
   @OneToMany(mappedBy = "teacher")
   private Set<Mark> marksTeacher;
+  @JsonIgnore
+  @OneToOne(mappedBy = "person")
+  private User user;
+
+  public Person() {
+
+  }
+
+  public Person(String firstName, String lastName, String patherName, char type) {
+    this.firstName = Objects.requireNonNull(firstName);
+    this.lastName = Objects.requireNonNull(lastName);
+    this.patherName = Objects.requireNonNull(patherName);
+    this.type = type;
+  }
 
   public long getId() {
     return id;
@@ -49,7 +67,7 @@ public class People {
   }
 
   public void setFirstName(String firstName) {
-    this.firstName = firstName;
+    this.firstName = Objects.requireNonNull(firstName);
   }
 
   public String getLastName() {
@@ -57,7 +75,7 @@ public class People {
   }
 
   public void setLastName(String lastName) {
-    this.lastName = lastName;
+    this.lastName = Objects.requireNonNull(lastName);
   }
 
   public String getPatherName() {
@@ -65,7 +83,7 @@ public class People {
   }
 
   public void setPatherName(String patherName) {
-    this.patherName = patherName;
+    this.patherName = Objects.requireNonNull(patherName);
   }
 
   public Group getGroup() {

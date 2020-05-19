@@ -3,8 +3,8 @@ package me.salieri.Java_Course.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.salieri.Java_Course.entity.Authority;
-import me.salieri.Java_Course.entity.SecuredUser;
 import me.salieri.Java_Course.entity.User;
+import me.salieri.Java_Course.model.UserRequest;
 import me.salieri.Java_Course.security.JwtTokenUtil;
 import me.salieri.Java_Course.service.AuthorityService;
 import me.salieri.Java_Course.service.UserService;
@@ -38,7 +38,7 @@ public class AuthController {
 
   @GetMapping("/auth")
   @Transactional
-  public ResponseEntity<?> createAuthenticationToken(@RequestBody User request) throws Exception {
+  public ResponseEntity<?> createAuthenticationToken(@RequestBody UserRequest request) throws Exception {
     return createAuthenticationToken(request.getUsername(), request.getPassword());
   }
 
@@ -71,7 +71,7 @@ public class AuthController {
 
   @GetMapping("/register")
   @Transactional
-  public ResponseEntity<?> registerUser(@RequestBody User request) {
+  public ResponseEntity<?> registerUser(@RequestBody UserRequest request) {
     return registerUser(request.getUsername(), request.getPassword());
   }
 
@@ -82,10 +82,17 @@ public class AuthController {
     ObjectNode json = mapper.createObjectNode();
     HttpStatus status = HttpStatus.BAD_REQUEST;
 
-    User user = new User(username, password);
+    User user;
+    try {
+      user = new User(username, password);
+    } catch (NullPointerException e) {
+      return APIUtils.apiResponse(json, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     Set<Authority> authorities = Collections.singleton(authorityService.loadAuthorityByName("USER"));
-    if (userService.saveUser(user, authorities)) {
-      user = userService.loadSecuredUserByUsername(username);
+    user.setAuthorities(authorities);
+    user = userService.saveUser(user);
+    if (user != null) {
       json.set("user", mapper.valueToTree(user));
       status = HttpStatus.CREATED;
     }

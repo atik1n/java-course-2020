@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -20,7 +21,15 @@ public class Group {
 
   @JsonIgnore
   @OneToMany(mappedBy="group")
-  private Set<People> people;
+  private Set<Person> people;
+
+  public Group() {
+
+  }
+
+  public Group(String name) {
+    this.name = Objects.requireNonNull(name);
+  }
 
   public long getId() {
     return id;
@@ -35,14 +44,14 @@ public class Group {
   }
 
   public void setName(String name) {
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
   }
 
-  public Set<People> getPeople() {
+  public Set<Person> getPeople() {
     return people;
   }
 
-  public void setPeople(Set<People> people) {
+  public void setPeople(Set<Person> people) {
     this.people = people;
   }
 }

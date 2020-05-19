@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -32,6 +33,9 @@ public class User implements UserDetails {
           inverseJoinColumns = @JoinColumn(name = "authority_id")
   )
   private Set<Authority> authorities;
+  @OneToOne(fetch = FetchType.EAGER)
+  @JoinColumn(referencedColumnName="id")
+  private Person person;
 
   public User() {
 
@@ -42,8 +46,8 @@ public class User implements UserDetails {
   }
 
   public User(String username, String password) {
-    this.username = username;
-    this.password = password;
+    this.username = Objects.requireNonNull(username);
+    this.password = Objects.requireNonNull(password);
   }
 
   @PrePersist
@@ -66,7 +70,7 @@ public class User implements UserDetails {
   }
 
   public void setPassword(String password) {
-    this.password = password;
+    this.password = Objects.requireNonNull(password);
   }
 
   public Long getId() {
@@ -74,7 +78,7 @@ public class User implements UserDetails {
   }
 
   public void setId(Long id) {
-    this.id = id;
+    this.id = Objects.requireNonNull(id);
   }
 
   @Override
@@ -83,7 +87,7 @@ public class User implements UserDetails {
   }
 
   public void setUsername(String username) {
-    this.username = username;
+    this.username = Objects.requireNonNull(username);
   }
 
   @Override
@@ -118,5 +122,13 @@ public class User implements UserDetails {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public Person getPerson() {
+    return person;
+  }
+
+  public void setPerson(Person person) {
+    this.person = person;
   }
 }
