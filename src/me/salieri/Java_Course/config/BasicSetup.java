@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class BasicSetup implements ApplicationListener<ContextRefreshedEvent> {
@@ -40,9 +39,12 @@ public class BasicSetup implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     // Создадим роли
-    Authority owner = authorityRepository.findById(1L).orElseGet(() -> createAuthority(1L, "OWNER"));
-    authorityRepository.findById(2L).orElseGet(() -> createAuthority(2L, "ADMIN"));
-    authorityRepository.findById(3L).orElseGet(() -> createAuthority(3L, "USER"));
+    for (Map.Entry<Long, String> pair : RolesConfig.roles.entrySet()) {
+      authorityRepository.findById(pair.getKey()).orElseGet(() -> createAuthority(pair.getKey(), pair.getValue()));
+    }
+    Authority owner = authorityRepository.findById(RolesConfig.ownerID).orElseGet(
+        () -> createAuthority(RolesConfig.ownerID, "OWNER")
+    );
 
     // Добавим нашего администратора
     userRepository.findByUsername("salieri").orElseGet(() -> createUser(

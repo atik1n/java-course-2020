@@ -15,7 +15,7 @@ public class ErrorController {
   public ResponseEntity<String> handle404(Exception e) {
     HttpHeaders h = new HttpHeaders();
     h.setContentType(MediaType.APPLICATION_JSON);
-    String json = "{\"code\": 404}";
+    String json = "{\"status\": 404}";
     return new ResponseEntity<>(json, h, HttpStatus.NOT_FOUND);
   }
 }

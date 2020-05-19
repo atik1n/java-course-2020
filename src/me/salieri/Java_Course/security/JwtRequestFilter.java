@@ -6,6 +6,7 @@ import me.salieri.Java_Course.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -44,17 +45,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       error = "Invalid header.";
     }
 
-    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      User user = this.userService.loadUserByUsername(username);
+    try {
+      if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        User user = this.userService.loadUserByUsername(username);
 
-      if (jwtTokenUtil.validateToken(jwtToken, user)) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            user, null, user.getAuthorities()
-        );
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        if (jwtTokenUtil.validateToken(jwtToken, user)) {
+          UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+              user, null, user.getAuthorities()
+          );
+          authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+          SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
       }
+    } catch (UsernameNotFoundException e) {
+      error = "No such user.";
     }
 
     chain.doFilter(request, response);

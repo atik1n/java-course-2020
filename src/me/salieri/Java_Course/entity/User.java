@@ -1,5 +1,6 @@
 package me.salieri.Java_Course.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -36,6 +37,10 @@ public class User implements UserDetails {
 
   }
 
+  public User(String username) {
+    this.username = username;
+  }
+
   public User(String username, String password) {
     this.username = username;
     this.password = password;
@@ -47,7 +52,7 @@ public class User implements UserDetails {
   }
 
   @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
+  public Set<Authority> getAuthorities() {
     return authorities;
   }
 
@@ -62,6 +67,14 @@ public class User implements UserDetails {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   @Override
@@ -96,5 +109,14 @@ public class User implements UserDetails {
   @Override
   public String toString() {
     return this.username + " " + this.authorities.toString();
+  }
+
+  @JsonIgnore
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 }

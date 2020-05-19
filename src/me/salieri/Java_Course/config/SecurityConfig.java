@@ -50,8 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.csrf().disable()
         .authorizeRequests()
-        .antMatchers("/admin/**").hasAnyAuthority("ADMIN", "OWNER")
-        .antMatchers("/control/**").hasAuthority("OWNER")
+        .antMatchers("/admin/**").hasAnyAuthority(RolesConfig.getOwner(), RolesConfig.getAdmin())
+        .antMatchers("/control/**").hasAuthority(RolesConfig.getOwner())
         .antMatchers("/user/**").authenticated()
         .anyRequest().permitAll().and()
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()

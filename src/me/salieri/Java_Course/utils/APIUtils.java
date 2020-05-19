@@ -1,17 +1,17 @@
 package me.salieri.Java_Course.utils;
 
 import me.salieri.Java_Course.model.APIResponse;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class APIUtils {
   private static final String version = "v0.1";
 
-  public static APIResponse apiResponse(Object response) {
-    return new APIResponse(version, HttpServletResponse.SC_OK, response);
+  public static ResponseEntity<?> apiResponse(Object response) {
+    return new ResponseEntity<>(new APIResponse(version, HttpStatus.OK.value(), response), HttpStatus.OK);
   }
 
-  public static APIResponse apiResponse(Object response, int status) {
-    return new APIResponse(version, status, response);
+  public static ResponseEntity<?> apiResponse(Object response, HttpStatus status) {
+    return new ResponseEntity<>(new APIResponse(version, status.value(), response), status);
   }
 }
