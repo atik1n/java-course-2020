@@ -3,8 +3,8 @@ package me.salieri.Java_Course.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.salieri.Java_Course.entity.Authority;
+import me.salieri.Java_Course.entity.SecuredUser;
 import me.salieri.Java_Course.entity.User;
-import me.salieri.Java_Course.model.JwtRequest;
 import me.salieri.Java_Course.security.JwtTokenUtil;
 import me.salieri.Java_Course.service.AuthorityService;
 import me.salieri.Java_Course.service.UserService;
@@ -38,7 +38,7 @@ public class AuthController {
 
   @GetMapping("/auth")
   @Transactional
-  public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest request) throws Exception {
+  public ResponseEntity<?> createAuthenticationToken(@RequestBody User request) throws Exception {
     return createAuthenticationToken(request.getUsername(), request.getPassword());
   }
 
@@ -70,11 +70,13 @@ public class AuthController {
   }
 
   @GetMapping("/register")
-  public ResponseEntity<?> registerUser(@RequestBody JwtRequest request) {
+  @Transactional
+  public ResponseEntity<?> registerUser(@RequestBody User request) {
     return registerUser(request.getUsername(), request.getPassword());
   }
 
   @GetMapping(path = "/register", params = { "username", "password" })
+  @Transactional
   public ResponseEntity<?> registerUser(@RequestParam String username, @RequestParam String password) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
@@ -83,7 +85,7 @@ public class AuthController {
     User user = new User(username, password);
     Set<Authority> authorities = Collections.singleton(authorityService.loadAuthorityByName("USER"));
     if (userService.saveUser(user, authorities)) {
-      user = userService.loadUserByUsername(username);
+      user = userService.loadSecuredUserByUsername(username);
       json.set("user", mapper.valueToTree(user));
       status = HttpStatus.CREATED;
     }

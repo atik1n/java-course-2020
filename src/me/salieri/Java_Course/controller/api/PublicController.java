@@ -34,8 +34,7 @@ public class PublicController {
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (!(auth instanceof AnonymousAuthenticationToken)) { ;
-      SecuredUser user = new SecuredUser();
-      BeanUtils.copyProperties(userService.loadUserByPrincipal(auth.getPrincipal()), user);
+      SecuredUser user = userService.loadSecuredUserByPrincipal(auth.getPrincipal());
       json.set("user", mapper.valueToTree(user));
       status = HttpStatus.OK;
     }
@@ -49,9 +48,8 @@ public class PublicController {
     ObjectNode json = mapper.createObjectNode();
     HttpStatus status = HttpStatus.OK;
 
-    SecuredUser user = new SecuredUser();
     try {
-      BeanUtils.copyProperties(userService.loadUserByUsername(username), user);
+      SecuredUser user = userService.loadSecuredUserByUsername(username);
       json.set("user", mapper.valueToTree(user));
     } catch (UsernameNotFoundException e) {
       status = HttpStatus.NOT_FOUND;
@@ -66,9 +64,8 @@ public class PublicController {
     ObjectNode json = mapper.createObjectNode();
     HttpStatus status = HttpStatus.OK;
 
-    SecuredUser user = new SecuredUser();
     try {
-      BeanUtils.copyProperties(userService.loadUserById(id), user);
+      SecuredUser user = userService.loadSecuredUserById(id);
       json.set("user", mapper.valueToTree(user));
     } catch (UsernameNotFoundException e) {
       status = HttpStatus.NOT_FOUND;

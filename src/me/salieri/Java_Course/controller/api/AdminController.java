@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +39,7 @@ public class AdminController {
   }
 
   @GetMapping(path = "/admin/deleteUser", params = { "username" })
+  @Transactional
   public ResponseEntity<?> deleteUser(@RequestParam String username) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
@@ -50,7 +52,7 @@ public class AdminController {
       return APIUtils.apiResponse(json, status);
     }
 
-    if (!userService.deleteUser(new User(username))) {
+    if (!userService.deleteUserByUsername(username)) {
       status = HttpStatus.BAD_REQUEST;
     }
 
