@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -22,6 +23,14 @@ public class Subject {
   @OneToMany(mappedBy="subject")
   private Set<Mark> marks;
 
+  public Subject() {
+
+  }
+
+  public Subject(String name) {
+    this.name = Objects.requireNonNull(name);
+  }
+
   public long getId() {
     return id;
   }
@@ -35,7 +44,7 @@ public class Subject {
   }
 
   public void setName(String name) {
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
   }
 
   public Set<Mark> getMarks() {

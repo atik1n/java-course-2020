@@ -35,14 +35,12 @@ public class AuthorityService {
   }
 
   public boolean hasAuthority(@NotNull User user, String name) {
-    boolean hasAuthority = false;
     for (GrantedAuthority authority : user.getAuthorities()) {
-      hasAuthority = authority.getAuthority().equals(name);
-      if (hasAuthority) {
-        break;
+      if (authority.getAuthority().equals(name)) {
+        return true;
       }
     }
-    return hasAuthority;
+    return false;
   }
 
   public List<Authority> allAuthorities() {

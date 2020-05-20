@@ -12,12 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 @RestController
@@ -25,71 +27,51 @@ public class UserController {
   @Autowired
   UserService userService;
 
-  @GetMapping(path = "/admin/allUsers")
+  @GetMapping("/admin/users.all")
+  @Transactional
   public ResponseEntity<?> allUsers() {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
 
     List<User> users = userService.allUsers();
-    ArrayNode usersNode = mapper.valueToTree(users);
-    json.putArray("users").addAll(usersNode);
+    ArrayNode node = mapper.valueToTree(users);
+    json.putArray("users").addAll(node);
 
     return APIUtils.apiResponse(json);
   }
 
-  @GetMapping(path = "/admin/deleteUser")
+  @GetMapping("/admin/users.delete")
   @Transactional
-  public ResponseEntity<?> deleteUser(@RequestBody UserRequest request) {
-    if (request.getId() != null) {
-      return deleteUser(request.getId());
+  public ResponseEntity<?> deactivateUser(@RequestBody UserRequest request) {
+    HttpStatus status;
+
+    try {
+      status = deactivateUser(userService.loadUserByRequest(request));
+    } catch (UsernameNotFoundException e) {
+      status = HttpStatus.BAD_REQUEST;
+    } catch (InvalidParameterException e) {
+      status = HttpStatus.UNPROCESSABLE_ENTITY;
     }
 
-    if (request.getUsername() != null) {
-      return deleteUser(request.getUsername());
-    }
-
-    return APIUtils.apiResponse(new ObjectMapper().createObjectNode(), HttpStatus.UNPROCESSABLE_ENTITY);
+    return APIUtils.emptyApiResponse(status);
   }
 
-  @GetMapping(path = "/admin/deleteUser", params = { "username" })
-  @Transactional
-  public ResponseEntity<?> deleteUser(@RequestParam String username) {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode json = mapper.createObjectNode();
-    HttpStatus status = HttpStatus.OK;
-
+  public HttpStatus deactivateUser(User user) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-    if (((User)auth.getPrincipal()).getUsername().equals(username)) {
-      status = HttpStatus.BAD_REQUEST;
-      return APIUtils.apiResponse(json, status);
+    User authUser;
+    try {
+      authUser = userService.loadUserByUsername(((User) auth.getPrincipal()).getUsername());
+    } catch (UsernameNotFoundException e) {
+      return HttpStatus.UNAUTHORIZED;
     }
 
-    if (!userService.deleteUserByUsername(username)) {
-      status = HttpStatus.BAD_REQUEST;
-    }
-
-    return APIUtils.apiResponse(json, status);
-  }
-
-  @GetMapping(path = "/admin/deleteUser", params = { "id" })
-  @Transactional
-  public ResponseEntity<?> deleteUser(@RequestParam Long id) {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode json = mapper.createObjectNode();
     HttpStatus status = HttpStatus.OK;
-
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    User user = userService.loadUserByUsername(((User)auth.getPrincipal()).getUsername());
-    if (user.getId().equals(id)) {
+    if (user.getId().equals(authUser.getId())) {
       status = HttpStatus.BAD_REQUEST;
-      return APIUtils.apiResponse(json, status);
-    }
-
-    if (!userService.deleteUserById(id)) {
+    } else if (!userService.deactivateUserById(user.getId())) {
       status = HttpStatus.BAD_REQUEST;
     }
 
-    return APIUtils.apiResponse(json, status);
+    return status;
   }
 }

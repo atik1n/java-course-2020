@@ -3,6 +3,7 @@ package me.salieri.Java_Course.controller.api.admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.salieri.Java_Course.entity.Person;
+import me.salieri.Java_Course.model.PersonRequest;
 import me.salieri.Java_Course.model.StudentRequest;
 import me.salieri.Java_Course.service.PersonService;
 import me.salieri.Java_Course.utils.APIUtils;
@@ -16,20 +17,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class StudentController {
+public class TeacherController {
   @Autowired
   PersonService personService;
 
-  @GetMapping("/admin/students.create")
+  @GetMapping("/admin/teachers.create")
   @Transactional
-  public ResponseEntity<?> createStudent(@RequestBody StudentRequest request) {
+  public ResponseEntity<?> createStudent(@RequestBody PersonRequest request) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
     HttpStatus status = HttpStatus.CREATED;
 
     Person person;
     try {
-      person = personService.createPerson(request, request.getGroup());
+      person = personService.createPerson(request, null);
       json.set("person", mapper.valueToTree(person));
       json.put("username", person.getUsername());
       json.put("password", person.getPassword());

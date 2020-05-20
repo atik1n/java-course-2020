@@ -1,12 +1,10 @@
 package me.salieri.Java_Course.controller.api.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import me.salieri.Java_Course.entity.Group;
-import me.salieri.Java_Course.entity.Person;
-import me.salieri.Java_Course.model.GroupRequest;
-import me.salieri.Java_Course.service.GroupService;
+import me.salieri.Java_Course.entity.Subject;
+import me.salieri.Java_Course.model.SubjectRequest;
+import me.salieri.Java_Course.service.SubjectService;
 import me.salieri.Java_Course.utils.APIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,43 +16,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Set;
 
 @RestController
-public class GroupController {
+public class SubjectController {
   @Autowired
-  GroupService groupService;
+  SubjectService subjectService;
 
-  @GetMapping("/admin/groups.create")
+  @GetMapping("/admin/subjects.create")
   @Transactional
-  public ResponseEntity<?> createGroup(@RequestBody GroupRequest request) {
+  public ResponseEntity<?> createSubject(@RequestBody SubjectRequest request) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
     HttpStatus status = HttpStatus.BAD_REQUEST;
 
-    Group group;
+    Subject subject;
     try {
-      group = new Group(request.getName());
+      subject = new Subject(request.getName());
     } catch (NullPointerException e) {
       return APIUtils.emptyApiResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    group = groupService.saveGroup(group);
-    if (group != null) {
-      json.set("group", mapper.valueToTree(group));
+    subject = subjectService.saveSubject(subject);
+    if (subject != null) {
+      json.set("group", mapper.valueToTree(subject));
       status = HttpStatus.CREATED;
     }
 
     return APIUtils.apiResponse(json, status);
   }
 
-  @GetMapping("/admin/groups.delete")
+  @GetMapping("/admin/subjects.delete")
   @Transactional
-  public ResponseEntity<?> deleteGroup(@RequestBody GroupRequest request) {
+  public ResponseEntity<?> deleteSubject(@RequestBody SubjectRequest request) {
     HttpStatus status;
     try {
-      status = deleteGroup(groupService.loadGroupByRequest(request));
+      status = deleteSubject(subjectService.loadSubjectByRequest(request));
     } catch (NotFoundException e) {
       status = HttpStatus.BAD_REQUEST;
     } catch (InvalidParameterException e) {
@@ -64,11 +60,11 @@ public class GroupController {
     return APIUtils.emptyApiResponse(status);
   }
 
-  private HttpStatus deleteGroup(Group group) {
+  private HttpStatus deleteSubject(Subject subject) {
     HttpStatus status = HttpStatus.OK;
-    if (!group.getPeople().isEmpty()) {
+    if (!subject.getMarks().isEmpty()) {
       status = HttpStatus.BAD_REQUEST;
-    } else if (!groupService.deleteGroupById(group.getId())) {
+    } else if (!subjectService.deleteSubjectById(subject.getId())) {
       status = HttpStatus.BAD_REQUEST;
     }
 

@@ -2,7 +2,16 @@ package me.salieri.Java_Course.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Objects;
@@ -13,6 +22,7 @@ import java.util.Set;
 public class Person {
   public static char STUDENT = 'S';
   public static char TEACHER = 'T';
+  public static char DISABLE = 'D';
 
   @Id
   @NotNull
@@ -42,6 +52,13 @@ public class Person {
   @JsonIgnore
   @OneToOne(mappedBy = "person")
   private User user;
+
+  @JsonIgnore
+  @Transient
+  private String username;
+  @JsonIgnore
+  @Transient
+  private String password;
 
   public Person() {
 
@@ -116,5 +133,47 @@ public class Person {
 
   public void setMarksTeacher(Set<Mark> marksTeacher) {
     this.marksTeacher = marksTeacher;
+  }
+
+  public String generateUsername() {
+    this.username = (
+        lastName + "." +
+        firstName.substring(0, 1) +
+        patherName.substring(0, 1)
+    ).toLowerCase();
+    return this.username;
+  }
+
+  public String generateUsername(int i) {
+    this.username = (
+        lastName + i + "." +
+        firstName.substring(0, 1) +
+        patherName.substring(0, 1)
+    ).toLowerCase();
+    return this.username;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }

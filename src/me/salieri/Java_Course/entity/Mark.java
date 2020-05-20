@@ -2,6 +2,7 @@ package me.salieri.Java_Course.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "marks")
@@ -20,7 +21,15 @@ public class Mark {
   @JoinColumn(referencedColumnName="id")
   private Person teacher;
   @NotNull
-  private int value;
+  private Integer value;
+
+  public Mark() {
+
+  }
+
+  public Mark(Integer value) {
+    this.value = Objects.requireNonNull(value);
+  }
 
   public long getId() {
     return id;

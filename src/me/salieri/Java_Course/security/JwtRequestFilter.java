@@ -3,6 +3,7 @@ package me.salieri.Java_Course.security;
 import io.jsonwebtoken.ExpiredJwtException;
 import me.salieri.Java_Course.entity.User;
 import me.salieri.Java_Course.service.UserService;
+import me.salieri.Java_Course.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +23,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   @Autowired
   private UserService userService;
   @Autowired
-  private JwtTokenUtil jwtTokenUtil;
+  private AuthUtils authUtils;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -35,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     if (requestTokenHeader != null && requestTokenHeader.startsWith("Nullpo! ")) {
       jwtToken = requestTokenHeader.substring(8);
       try {
-        username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        username = authUtils.getUsernameFromToken(jwtToken);
       } catch (IllegalArgumentException e) {
         error = "Invalid token.";
       } catch (ExpiredJwtException e) {
@@ -49,7 +50,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         User user = userService.loadUserByUsername(username);
 
-        if (jwtTokenUtil.validateToken(jwtToken, user)) {
+        if (authUtils.validateToken(jwtToken, user)) {
           UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
               user, null, user.getAuthorities()
           );

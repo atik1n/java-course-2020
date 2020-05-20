@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,8 @@ public class PublicController {
   @Autowired
   UserService userService;
 
-  @GetMapping(path = "/getUser")
+  @GetMapping("/users.get")
+  @Transactional
   public ResponseEntity<?> getUser() {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
@@ -42,7 +44,8 @@ public class PublicController {
     return APIUtils.apiResponse(json, status);
   }
 
-  @GetMapping(path = "/getUser", params = { "username" })
+  @GetMapping(path = "/users.get", params = { "username" })
+  @Transactional
   public ResponseEntity<?> getUser(@RequestParam String username) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();
@@ -58,7 +61,8 @@ public class PublicController {
     return APIUtils.apiResponse(json, status);
   }
 
-  @GetMapping(path = "/getUser", params = { "id" })
+  @GetMapping(path = "/users.get", params = { "id" })
+  @Transactional
   public ResponseEntity<?> getUser(@RequestParam Long id) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode json = mapper.createObjectNode();

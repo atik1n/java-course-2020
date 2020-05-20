@@ -1,9 +1,9 @@
 package me.salieri.Java_Course.model;
 
-public class GroupRequest extends EntityRequest {
+public class SubjectRequest extends EntityRequest {
   private String name;
 
-  public GroupRequest() {
+  public SubjectRequest() {
 
   }
 
